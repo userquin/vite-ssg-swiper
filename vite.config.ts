@@ -1,4 +1,5 @@
 import path from 'path'
+import { promises as fs } from 'fs'
 import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import Pages from 'vite-plugin-pages'
@@ -24,6 +25,22 @@ export default defineConfig({
     },
   },
   plugins: [
+    {
+      name: 'fix-swipper-css',
+      enforce: 'pre',
+      resolveId(id) {
+        if (id === 'swiper.css') return 'fix-swiper.css'
+      },
+      async load(id) {
+        if (id === 'fix-swiper.css') {
+          return await fs.readFile(
+            './node_modules/swiper/swiper.min.css',
+            'utf-8',
+          )
+        }
+      },
+    },
+
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),
